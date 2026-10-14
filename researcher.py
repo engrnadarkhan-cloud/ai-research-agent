@@ -115,10 +115,27 @@ def research_topic(topic: str, api_key: str) -> tuple[str, list[str]]:
         raise RuntimeError("The AI returned an empty report.")
 
     # Validate citation numbering before displaying the report
+    
+    # Convert Unicode citations to normal square brackets
+    report = re.sub(
+        r"【\s*(\d+)\s*】",
+        r"[\1]",
+        report
+    )
+
+    # Extract numbered citations
     used_citations = {
-        int(number)
-        for number in re.findall(r"\[(\d+)\]", report)
+        int(n)
+        for n in re.findall(r"\[(\d+)\]", report)
     }
+
+    # Reject reports without numbered citations
+    if not used_citations:
+        raise RuntimeError(
+            "Citation validation failed: "
+            "No numbered citations found."
+        )
+
     valid_citations = set(range(1, len(source_urls) + 1))
     invalid_citations = used_citations - valid_citations
 
