@@ -154,10 +154,29 @@ def research_topic(topic: str, api_key: str) -> tuple[str, list[str]]:
             f"Invalid references: {sorted(invalid_citations)}"
         )
 
-    # Append links from the original search tool, not generated links
+    
+    # Identify evidence type for each retrieved source
+    evidence_types = {}
+
+    for match in re.finditer(
+        r"(?m)^URL:[ \t]*(https?://\S+)\r?\nEvidence Type:[ \t]*(ARTICLE_EXCERPT|SNIPPET_ONLY)",
+        search_results
+    ):
+        evidence_types[match.group(1)] = match.group(2)
+
+    # Append real source URLs and evidence types
     references = "\n\n## Retrieved Web Sources\n"
+
     for index, url in enumerate(source_urls, start=1):
-        references += f"\n[{index}] {url}\n"
+        evidence_type = evidence_types.get(
+            url, "UNKNOWN"
+        )
+
+        references += (
+            f"\n[{index}] {url}\n"
+            f"Evidence Type: {evidence_type}\n"
+        )
 
     report = report + references
     return report, source_urls
+
