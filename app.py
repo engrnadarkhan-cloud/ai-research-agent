@@ -108,6 +108,32 @@ if st.session_state.report:
     st.header("Research Report")
 
     st.markdown(st.session_state.report)
+    
+    # Check the available research evidence
+    references_section = st.session_state.report.rsplit(
+        "## Retrieved Web Sources", 1
+    )[-1]
+
+    snippet_count = references_section.count(
+        "Evidence Type: SNIPPET_ONLY"
+    )
+
+    article_count = references_section.count(
+        "Evidence Type: ARTICLE_EXCERPT"
+    )
+
+    # Display evidence quality information
+    st.info(
+        f"Research Evidence: {article_count} article excerpts "
+        f"and {snippet_count} search snippets."
+    )
+
+    if snippet_count > 0 and article_count == 0:
+        st.warning(
+            "This report is based only on search snippets. "
+            "The full article contents were not retrieved. "
+            "Please verify important claims from original sources."
+        )
 
     st.caption(
         f"Retrieved sources: "
