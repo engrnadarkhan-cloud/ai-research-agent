@@ -172,6 +172,26 @@ research_task = Task(
 
     if not report or not report.strip():
         raise RuntimeError("The AI returned an empty report.")
+    
+# Validate numbered citations
+used_citations = {
+    int(n)
+    for n in re.findall(r"\[(\d+)\]", report)
+}
+
+valid_citations = set(
+    range(1, len(source_urls) + 1)
+)
+
+invalid_citations = (
+    used_citations - valid_citations
+)
+
+if invalid_citations:
+    raise RuntimeError(
+        "Citation validation failed. "
+        f"Invalid references: {sorted(invalid_citations)}"
+    )
 
     # 9. Append original source URLs, not AI-generated URLs
     references = "\n\n## Retrieved Web Sources\n"
