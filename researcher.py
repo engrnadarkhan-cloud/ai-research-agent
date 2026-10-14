@@ -1,7 +1,13 @@
 
+
 import re
 
+# CrewAI-Groq compatibility workaround
+import crewai.llms.cache as crew_cache
+crew_cache.mark_cache_breakpoint = lambda msg: msg
+
 from crewai import Agent, Task, Crew, LLM, Process
+
 from crewai.tools import tool
 
 from search_tool import search_web
